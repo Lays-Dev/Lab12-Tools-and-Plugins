@@ -241,6 +241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryManager
   inventory: []
+  searchItemName: Sword
 --- !u!4 &898064379
 Transform:
   m_ObjectHideFlags: 0

@@ -9,6 +9,9 @@ public class InventoryManager : MonoBehaviour
     // Stores all possible inventory items in an inventroy list.
     public List<InventoryItem> inventory = new List<InventoryItem>();
 
+    // Name passed to the linear search. Change this in the Inspector.
+    public string searchItemName = "Sword";
+
     // Array of items used to generate inventory.
     private string[] itemNames =
     {
@@ -36,7 +39,7 @@ public class InventoryManager : MonoBehaviour
         // InventoryItem is the type of object that will be stored. 
         // foundItem is the variable name.
         // LinearSearchByName calls the search method which is further down. 
-        InventoryItem foundItem = LinearSearchByName("Sword");
+        InventoryItem foundItem = LinearSearchByName(searchItemName);
 
         // Null check
         if (foundItem != null)
@@ -45,7 +48,7 @@ public class InventoryManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Item not found!");
+            Debug.Log("Item not found: " + searchItemName);
         }
 
         // Sort inventory by ID before Binary Search.
@@ -61,6 +64,14 @@ public class InventoryManager : MonoBehaviour
         else
         {
             Debug.Log("Item ID not found!");
+        }
+
+        // Quick sort by value after binary search, which needs ID order.
+        QuickSortByValue();
+
+        foreach (InventoryItem item in inventory)
+        {
+            Debug.Log("Quick Sort By Value: " + item.Name + " with ID: " + item.ID + " and Value: " + item.Value);
         }
     }
 
@@ -166,5 +177,53 @@ public class InventoryManager : MonoBehaviour
         return null;
     }
 
-    // QuickSortByValue Method 
+    // Quick sort by item value.
+    // Entry point used by Start after the searches finish.
+    public void QuickSortByValue()
+    {
+        QuickSortByValue(0, inventory.Count - 1);
+
+        Debug.Log("Inventory Sorted By Value!");
+    }
+
+    // Recursively sort the range from first through last.
+    void QuickSortByValue(int first, int last)
+    {
+        if (first < last)
+        {
+            // Place the pivot and sort each side of it.
+            int pivot = PartitionByValue(first, last);
+
+            QuickSortByValue(first, pivot - 1);
+            QuickSortByValue(pivot + 1, last);
+        }
+    }
+
+    // Partition the range so values smaller than the pivot come first.
+    int PartitionByValue(int first, int last)
+    {
+        // The last item in the range is the pivot.
+        int pivot = inventory[last].Value;
+        int smaller = first - 1;
+
+        for (int element = first; element < last; element++)
+        {
+            // Move items smaller than the pivot toward the front.
+            if (inventory[element].Value < pivot)
+            {
+                smaller++;
+
+                InventoryItem temporary = inventory[smaller];
+                inventory[smaller] = inventory[element];
+                inventory[element] = temporary;
+            }
+        }
+
+        // Place the pivot just after the smaller items.
+        InventoryItem temporaryNext = inventory[smaller + 1];
+        inventory[smaller + 1] = inventory[last];
+        inventory[last] = temporaryNext;
+
+        return smaller + 1;
+    }
 }
